@@ -1,0 +1,6 @@
+{
+  "name": "Dino Game Event System",
+  "description": "Arcade Dino runner game and live leaderboard event system with team registration, real-time leaderboard ranking, and admin dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
