@@ -1,105 +1,74 @@
 import { Team, ScoreLog, EventStats } from '../types';
+import { db } from './firebase';
+import { 
+  collection, 
+  doc, 
+  setDoc, 
+  onSnapshot, 
+  getDocs, 
+  deleteDoc, 
+  writeBatch
+} from 'firebase/firestore';
 
-const STORAGE_KEY = 'dino_event_teams_v1';
 const ADMIN_PIN_KEY = 'dino_event_admin_pin_v1';
 const DEFAULT_PIN = '1234';
-const CHANNEL_NAME = 'dino_event_sync_channel';
 
-// Initialize broadcast channel for real-time cross-tab updates
-let broadcastChannel: BroadcastChannel | null = null;
-if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-  try {
-    broadcastChannel = new BroadcastChannel(CHANNEL_NAME);
-  } catch {
-    broadcastChannel = null;
-  }
-}
+// Local cache to maintain synchronous API
+let localTeamsCache: Team[] = [];
+let isInitialized = false;
 
-export function notifyCrossTabUpdate() {
-  if (typeof window !== 'undefined') {
-    try {
-      window.dispatchEvent(new Event('dino_local_update'));
-    } catch {
-      // Event fallback
-    }
-  }
-  if (broadcastChannel) {
-    try {
-      broadcastChannel.postMessage({ type: 'UPDATE_LEADERBOARD', timestamp: Date.now() });
-    } catch {
-      // Channel error fallback
-    }
-  }
+// Subscriptions
+type Listener = () => void;
+const listeners: Set<Listener> = new Set();
+
+function notifyListeners() {
+  listeners.forEach(l => l());
 }
 
 export function subscribeToUpdates(callback: () => void): () => void {
-  const handleStorage = (e: StorageEvent) => {
-    if (e.key === STORAGE_KEY) {
-      callback();
+  listeners.add(callback);
+  
+  // Initialize Firestore listener on first subscription
+  if (!isInitialized) {
+    isInitialized = true;
+    try {
+      const teamsCol = collection(db, 'teams');
+      onSnapshot(teamsCol, (snapshot) => {
+        const teams: Team[] = [];
+        snapshot.forEach((doc) => {
+          teams.push(doc.data() as Team);
+        });
+        localTeamsCache = teams;
+        notifyListeners();
+      }, (error) => {
+        console.error("Firestore subscription error:", error);
+      });
+    } catch (e) {
+      console.warn("Failed to connect to Firebase. Falling back to local cache only.", e);
     }
-  };
-
-  const handleMessage = () => {
-    callback();
-  };
-
-  const handleLocalUpdate = () => {
-    callback();
-  };
-
-  window.addEventListener('storage', handleStorage);
-  window.addEventListener('dino_local_update', handleLocalUpdate);
-  if (broadcastChannel) {
-    broadcastChannel.addEventListener('message', handleMessage);
   }
 
   return () => {
-    window.removeEventListener('storage', handleStorage);
-    window.removeEventListener('dino_local_update', handleLocalUpdate);
-    if (broadcastChannel) {
-      broadcastChannel.removeEventListener('message', handleMessage);
-    }
+    listeners.delete(callback);
   };
 }
 
 export function getTeams(): Team[] {
-  if (typeof window === 'undefined') return [];
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) {
-    const initial = getDemoTeams();
-    saveTeams(initial, false);
-    return initial;
-  }
-  try {
-    return JSON.parse(raw) as Team[];
-  } catch {
-    return [];
-  }
-}
-
-export function saveTeams(teams: Team[], notify = true) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
-  if (notify) {
-    notifyCrossTabUpdate();
-  }
+  return localTeamsCache;
 }
 
 export function getRankedTeams(teams: Team[] = getTeams()): Team[] {
   return [...teams].sort((a, b) => {
-    // 1. Highest score first
     if (b.highScore !== a.highScore) {
       return b.highScore - a.highScore;
     }
-    // 2. Tie-breaker: Earlier timestamp gets higher rank
     const timeA = a.highScoreTimestamp || a.createdAt || 0;
     const timeB = b.highScoreTimestamp || b.createdAt || 0;
     return timeA - timeB;
   });
 }
 
-export function registerTeam(teamData: { name: string; player1: string; player2: string; contact?: string }): Team {
-  const teams = getTeams();
+export async function registerTeam(teamData: { name: string; player1: string; player2: string; contact?: string }): Promise<Team> {
   const timestamp = Date.now();
   const randomSuffix = Math.floor(1000 + Math.random() * 9000);
   const newTeam: Team = {
@@ -115,19 +84,26 @@ export function registerTeam(teamData: { name: string; player1: string; player2:
     scoreHistory: [],
   };
 
-  teams.push(newTeam);
-  saveTeams(teams);
+  // Optimistic update
+  localTeamsCache.push(newTeam);
+  notifyListeners();
+
+  try {
+    await setDoc(doc(db, 'teams', newTeam.id), newTeam);
+  } catch (e) {
+    console.error("Error saving team to Firestore", e);
+  }
+  
   return newTeam;
 }
 
-export function submitScore(teamId: string, score: number): { team: Team; isNewHighScore: boolean; previousHighScore: number } {
-  const teams = getTeams();
-  const index = teams.findIndex((t) => t.id === teamId);
+export async function submitScore(teamId: string, score: number): Promise<{ team: Team; isNewHighScore: boolean; previousHighScore: number }> {
+  const index = localTeamsCache.findIndex((t) => t.id === teamId);
   if (index === -1) {
     throw new Error('Team not found');
   }
 
-  const team = { ...teams[index] };
+  const team = { ...localTeamsCache[index] };
   const timestamp = Date.now();
   const previousHighScore = team.highScore;
   const isNewHighScore = score > previousHighScore;
@@ -146,8 +122,15 @@ export function submitScore(teamId: string, score: number): { team: Team; isNewH
     team.highScoreTimestamp = timestamp;
   }
 
-  teams[index] = team;
-  saveTeams(teams);
+  // Optimistic update
+  localTeamsCache[index] = team;
+  notifyListeners();
+
+  try {
+    await setDoc(doc(db, 'teams', team.id), team);
+  } catch (e) {
+    console.error("Error updating score in Firestore", e);
+  }
 
   return { team, isNewHighScore, previousHighScore };
 }
@@ -186,28 +169,65 @@ export function getEventStats(): EventStats {
   };
 }
 
-export function deleteTeam(teamId: string) {
-  const teams = getTeams().filter((t) => t.id !== teamId);
-  saveTeams(teams);
-}
+export async function deleteTeam(teamId: string) {
+  // Optimistic update
+  localTeamsCache = localTeamsCache.filter((t) => t.id !== teamId);
+  notifyListeners();
 
-export function updateTeamScore(teamId: string, newHighScore: number) {
-  const teams = getTeams();
-  const team = teams.find((t) => t.id === teamId);
-  if (team) {
-    team.highScore = Math.max(0, newHighScore);
-    team.highScoreTimestamp = Date.now();
-    saveTeams(teams);
+  try {
+    await deleteDoc(doc(db, 'teams', teamId));
+  } catch (e) {
+    console.error("Error deleting team from Firestore", e);
   }
 }
 
-export function resetAllData() {
-  saveTeams([]);
+export async function updateTeamScore(teamId: string, newHighScore: number) {
+  const team = localTeamsCache.find((t) => t.id === teamId);
+  if (team) {
+    team.highScore = Math.max(0, newHighScore);
+    team.highScoreTimestamp = Date.now();
+    notifyListeners();
+
+    try {
+      await setDoc(doc(db, 'teams', team.id), team);
+    } catch (e) {
+      console.error("Error updating team score in Firestore", e);
+    }
+  }
 }
 
-export function seedDemoData() {
+export async function resetAllData() {
+  localTeamsCache = [];
+  notifyListeners();
+
+  try {
+    const teamsCol = collection(db, 'teams');
+    const snapshot = await getDocs(teamsCol);
+    const batch = writeBatch(db);
+    snapshot.docs.forEach((d) => {
+      batch.delete(d.ref);
+    });
+    await batch.commit();
+  } catch (e) {
+    console.error("Error resetting data in Firestore", e);
+  }
+}
+
+export async function seedDemoData() {
   const demo = getDemoTeams();
-  saveTeams(demo);
+  localTeamsCache = [...localTeamsCache, ...demo];
+  notifyListeners();
+
+  try {
+    const batch = writeBatch(db);
+    demo.forEach(team => {
+      const ref = doc(db, 'teams', team.id);
+      batch.set(ref, team);
+    });
+    await batch.commit();
+  } catch (e) {
+    console.error("Error seeding data in Firestore", e);
+  }
 }
 
 export function exportToCSV() {
@@ -257,7 +277,7 @@ function getDemoTeams(): Team[] {
   const now = Date.now();
   return [
     {
-      id: 'TEAM-1001',
+      id: `TEAM-${Math.floor(1000 + Math.random() * 9000)}`,
       name: 'Google Chrome Velocity',
       player1: 'Alex Chen',
       player2: 'Sarah Jenkins',
@@ -267,67 +287,8 @@ function getDemoTeams(): Team[] {
       totalAttempts: 3,
       createdAt: now - 3600000 * 3,
       scoreHistory: [
-        { id: 'SCR-1', score: 14250, timestamp: now - 3600000 * 2 },
-        { id: 'SCR-2', score: 9800, timestamp: now - 3600000 * 2.5 },
+        { id: `SCR-${now}-1`, score: 14250, timestamp: now - 3600000 * 2 },
       ],
-    },
-    {
-      id: 'TEAM-1002',
-      name: 'Pixel Runners',
-      player1: 'Marcus Vance',
-      player2: 'Elena Rostova',
-      contact: '9876543210',
-      highScore: 12800,
-      highScoreTimestamp: now - 3600000 * 1.5,
-      totalAttempts: 2,
-      createdAt: now - 3600000 * 2.5,
-      scoreHistory: [
-        { id: 'SCR-3', score: 12800, timestamp: now - 3600000 * 1.5 },
-        { id: 'SCR-4', score: 7200, timestamp: now - 3600000 * 2 },
-      ],
-    },
-    {
-      id: 'TEAM-1003',
-      name: 'Android Jumpers',
-      player1: 'David Kim',
-      player2: 'Priya Sharma',
-      contact: 'priya@example.com',
-      highScore: 11450,
-      highScoreTimestamp: now - 3600000 * 1,
-      totalAttempts: 4,
-      createdAt: now - 3600000 * 2,
-      scoreHistory: [
-        { id: 'SCR-5', score: 11450, timestamp: now - 3600000 * 1 },
-        { id: 'SCR-6', score: 10200, timestamp: now - 3600000 * 1.2 },
-      ],
-    },
-    {
-      id: 'TEAM-1004',
-      name: 'Gemini Sparks',
-      player1: 'Leo Garcia',
-      player2: 'Sophia Martinez',
-      contact: 'leo.g@example.com',
-      highScore: 9900,
-      highScoreTimestamp: now - 1800000,
-      totalAttempts: 2,
-      createdAt: now - 3600000 * 1.2,
-      scoreHistory: [
-        { id: 'SCR-7', score: 9900, timestamp: now - 1800000 },
-      ],
-    },
-    {
-      id: 'TEAM-1005',
-      name: 'Cactus Dodgers',
-      player1: 'Jordan Taylor',
-      player2: 'Chris Morgan',
-      contact: 'jordan@example.com',
-      highScore: 8400,
-      highScoreTimestamp: now - 900000,
-      totalAttempts: 1,
-      createdAt: now - 1200000,
-      scoreHistory: [
-        { id: 'SCR-8', score: 8400, timestamp: now - 900000 },
-      ],
-    },
+    }
   ];
 }

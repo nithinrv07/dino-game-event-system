@@ -227,20 +227,20 @@ export const DinoGame: React.FC<DinoGameProps> = ({ activeTeam, onScoreSubmitted
   // Generate background stars, clouds & ground flowers
   useEffect(() => {
     const stars: Star[] = [];
-    for (let i = 0; i < 35; i++) {
+    for (let i = 0; i < 60; i++) {
       stars.push({
-        x: Math.random() * 800,
-        y: Math.random() * 110,
+        x: Math.random() * 1200,
+        y: Math.random() * 250,
         size: Math.random() * 2 + 1,
       });
     }
     starsRef.current = stars;
 
     const clouds: Cloud[] = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       clouds.push({
-        x: Math.random() * 800,
-        y: 20 + Math.random() * 50,
+        x: Math.random() * 1200,
+        y: 20 + Math.random() * 120,
         speed: 0.5 + Math.random() * 0.7,
       });
     }
@@ -248,7 +248,7 @@ export const DinoGame: React.FC<DinoGameProps> = ({ activeTeam, onScoreSubmitted
 
     const flowers: Flower[] = [];
     const petalColors = ['#EF4444', '#EC4899', '#F59E0B', '#3B82F6', '#A855F7', '#F43F5E', '#34D399'];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 9; i++) {
       flowers.push({
         x: i * 160 + Math.random() * 50,
         petalColor: petalColors[i % petalColors.length],
@@ -334,7 +334,7 @@ export const DinoGame: React.FC<DinoGameProps> = ({ activeTeam, onScoreSubmitted
 
     const petalColors = ['#EF4444', '#EC4899', '#F59E0B', '#3B82F6', '#A855F7', '#F43F5E', '#34D399'];
     const flowers: Flower[] = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 9; i++) {
       flowers.push({
         x: i * 160 + Math.random() * 50,
         petalColor: petalColors[i % petalColors.length],
@@ -541,20 +541,22 @@ export const DinoGame: React.FC<DinoGameProps> = ({ activeTeam, onScoreSubmitted
       // Auto Submit score on Game Over
       const finalScoreInt = currentScoreInt;
       if (activeTeamRef.current) {
-        try {
-          const res = submitScore(activeTeamRef.current.id, finalScoreInt);
-          setScoreSubmitted(true);
-          setSubmissionSuccess({ isNewHigh: res.isNewHighScore });
-          if (res.isNewHighScore) {
-            setHighScore(res.team.highScore);
-            triggerHighscoreConfetti();
+        (async () => {
+          try {
+            const res = await submitScore(activeTeamRef.current.id, finalScoreInt);
+            setScoreSubmitted(true);
+            setSubmissionSuccess({ isNewHigh: res.isNewHighScore });
+            if (res.isNewHighScore) {
+              setHighScore(res.team.highScore);
+              triggerHighscoreConfetti();
+            }
+            if (onScoreSubmittedRef.current) {
+              onScoreSubmittedRef.current(res.team, finalScoreInt, res.isNewHighScore);
+            }
+          } catch {
+            // Submission fallback
           }
-          if (onScoreSubmittedRef.current) {
-            onScoreSubmittedRef.current(res.team, finalScoreInt, res.isNewHighScore);
-          }
-        } catch {
-          // Submission fallback
-        }
+        })();
       }
 
       return; // Stop game loop
@@ -952,7 +954,7 @@ export const DinoGame: React.FC<DinoGameProps> = ({ activeTeam, onScoreSubmitted
     audio.playClick();
 
     try {
-      const res = submitScore(activeTeam.id, score);
+      const res = await submitScore(activeTeam.id, score);
       setScoreSubmitted(true);
       setSubmissionSuccess({ isNewHigh: res.isNewHighScore });
       if (res.isNewHighScore) {
@@ -977,7 +979,7 @@ export const DinoGame: React.FC<DinoGameProps> = ({ activeTeam, onScoreSubmitted
   }, []);
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-6 p-4 sm:p-6">
+    <div className="w-full max-w-6xl mx-auto flex flex-col items-center gap-6 p-4 sm:p-6">
       {/* Team Header Bar */}
       <div className="w-full bg-white border-2 border-gray-200 rounded-3xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         <div className="flex items-center gap-3">
@@ -1060,9 +1062,9 @@ export const DinoGame: React.FC<DinoGameProps> = ({ activeTeam, onScoreSubmitted
         <div className="relative w-full overflow-hidden bg-[#f8f9fa] flex justify-center items-center py-2">
           <canvas
             ref={canvasRef}
-            width={800}
-            height={260}
-            className="w-full h-[260px] max-w-[800px] cursor-pointer touch-none select-none"
+            width={1200}
+            height={400}
+            className="w-full h-[400px] max-w-[1200px] cursor-pointer touch-none select-none"
             onClick={triggerJump}
           />
 

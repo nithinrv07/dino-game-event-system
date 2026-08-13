@@ -66,15 +66,15 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
   const restTeams = filteredTeams.slice(3);
 
   return (
-    <div className={`w-full max-w-6xl mx-auto p-4 sm:p-6 transition-all ${isFullscreen ? 'bg-[#f8f9fa] p-8' : ''}`}>
+    <div className={`w-full max-w-6xl mx-auto p-4 sm:p-6 transition-all ${isFullscreen ? 'bg-slate-950 p-8' : ''}`}>
       {/* Event Top Banner & Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-200">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-white/5 backdrop-blur-xl p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-white/10 text-white">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#EA4335] animate-ping"></span>
             <span className="text-xs font-black uppercase tracking-widest text-[#EA4335]">LIVE STALL LEADERBOARD</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-[#202124] tracking-tight flex items-center gap-3">
+          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight flex items-center gap-3">
             <span>Dino Runner Champions</span>
             <Sparkles className="w-7 h-7 text-[#FBBC05]" />
           </h1>
@@ -88,13 +88,13 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search team or player..."
-              className="bg-gray-100 border-2 border-transparent focus:border-[#4285F4] focus:bg-white rounded-xl py-1.5 pl-9 pr-3 text-xs text-[#202124] font-semibold outline-none w-44 sm:w-56"
+              className="bg-white/10 border-2 border-transparent focus:border-[#4285F4] focus:bg-white/20 rounded-xl py-1.5 pl-9 pr-3 text-xs text-white placeholder-gray-400 font-semibold outline-none w-44 sm:w-56"
             />
           </div>
 
           <button
             onClick={reloadData}
-            className="p-2.5 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-gray-700 transition-colors cursor-pointer"
+            className="p-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-white transition-colors cursor-pointer"
             title="Refresh Leaderboard"
           >
             <RefreshCw className="w-4 h-4" />
@@ -113,7 +113,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
       {/* Metric Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {/* Metric 1: Total Teams */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center gap-3 relative overflow-hidden shadow-sm">
+        <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 flex items-center gap-3 relative overflow-hidden shadow-sm">
           <div className="w-2 rounded-full h-full bg-[#4285F4] absolute left-0 top-0 bottom-0"></div>
           <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#4285F4] flex items-center justify-center font-bold">
             <Users className="w-5 h-5" />
@@ -125,7 +125,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
         </div>
 
         {/* Metric 2: Top Event Score */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center gap-3 relative overflow-hidden shadow-sm">
+        <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 flex items-center gap-3 relative overflow-hidden shadow-sm">
           <div className="w-2 rounded-full h-full bg-[#FBBC05] absolute left-0 top-0 bottom-0"></div>
           <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#FBBC05] flex items-center justify-center font-bold">
             <Trophy className="w-5 h-5" />
@@ -137,7 +137,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
         </div>
 
         {/* Metric 3: Total Games Played */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center gap-3 relative overflow-hidden shadow-sm">
+        <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 flex items-center gap-3 relative overflow-hidden shadow-sm">
           <div className="w-2 rounded-full h-full bg-[#34A853] absolute left-0 top-0 bottom-0"></div>
           <div className="w-10 h-10 rounded-xl bg-green-50 text-[#34A853] flex items-center justify-center font-bold">
             <Flame className="w-5 h-5" />
@@ -149,7 +149,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
         </div>
 
         {/* Metric 4: Latest Score Ticker */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center gap-3 relative overflow-hidden shadow-sm">
+        <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 flex items-center gap-3 relative overflow-hidden shadow-sm">
           <div className="w-2 rounded-full h-full bg-[#EA4335] absolute left-0 top-0 bottom-0"></div>
           <div className="w-10 h-10 rounded-xl bg-red-50 text-[#EA4335] flex items-center justify-center font-bold">
             ⚡
@@ -301,9 +301,9 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
       )}
 
       {/* FULL RANKINGS LIST TABLE (Ranks 4+ and complete listing) */}
-      <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-xl">
-        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between flex-wrap gap-2">
-          <h2 className="text-sm font-black text-[#202124] uppercase tracking-wider flex items-center gap-2">
+      <div className="bg-white/5 backdrop-blur-lg rounded-3xl border border-white/10 overflow-hidden shadow-xl text-white">
+        <div className="px-6 py-4 bg-white/5 border-b border-white/10 flex items-center justify-between flex-wrap gap-2">
+          <h2 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
             <Trophy className="w-4 h-4 text-[#FBBC05]" />
             Complete Event Rankings ({filteredTeams.length})
           </h2>

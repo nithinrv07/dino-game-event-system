@@ -18,14 +18,14 @@ export const Header: React.FC<HeaderProps> = ({
   onRequestAdminLock,
 }) => {
   return (
-    <header className="w-full bg-[#4285F4] text-white shadow-lg sticky top-0 z-40">
+    <header className="w-full bg-slate-900/60 backdrop-blur-xl border-b border-white/10 text-white shadow-lg sticky top-0 z-40">
       {/* Top Google Colors Bar */}
       <div className="h-1 bg-gradient-to-r from-blue-300 via-red-400 via-yellow-300 to-green-400 w-full opacity-80"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
         {/* Brand Logo & Name */}
         <div className="flex items-center gap-4">
-          <div className="bg-white p-2.5 rounded-2xl shadow-inner flex items-center justify-center text-2xl">
+          <div className="bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] p-2.5 rounded-2xl flex items-center justify-center text-2xl">
             🦖
           </div>
 
@@ -43,14 +43,14 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* View Mode Navigation Tabs */}
-        <nav className="flex items-center p-1.5 bg-blue-700/60 rounded-2xl border border-blue-400/30 backdrop-blur-sm">
+        <nav className="flex items-center p-1.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
           {/* Play / Registration View */}
           <button
             onClick={() => onViewChange('play')}
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
               currentView === 'play'
-                ? 'bg-white text-[#4285F4] shadow-md scale-105'
-                : 'text-white hover:bg-blue-600/50'
+                ? 'bg-[#4285F4] text-white shadow-[0_0_15px_rgba(66,133,244,0.5)] scale-105'
+                : 'text-slate-300 hover:bg-white/10 hover:text-white'
             }`}
           >
             <Gamepad2 className="w-4 h-4" />
@@ -62,8 +62,8 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onViewChange('leaderboard')}
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
               currentView === 'leaderboard'
-                ? 'bg-[#FBBC05] text-slate-950 shadow-md scale-105'
-                : 'text-white hover:bg-blue-600/50'
+                ? 'bg-[#FBBC05] text-slate-950 shadow-[0_0_15px_rgba(251,188,5,0.5)] scale-105'
+                : 'text-slate-300 hover:bg-white/10 hover:text-white'
             }`}
           >
             <Tv className="w-4 h-4" />
@@ -81,8 +81,8 @@ export const Header: React.FC<HeaderProps> = ({
             }}
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
               currentView === 'admin'
-                ? 'bg-[#34A853] text-white shadow-md scale-105'
-                : 'text-white hover:bg-blue-600/50'
+                ? 'bg-[#34A853] text-white shadow-[0_0_15px_rgba(52,168,83,0.5)] scale-105'
+                : 'text-slate-300 hover:bg-white/10 hover:text-white'
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
@@ -97,7 +97,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="opacity-90">Playing:</span>
             <span className="font-extrabold truncate max-w-[130px]">{activeTeam.name}</span>
             <span className="bg-[#FBBC05] text-slate-950 px-2 py-0.5 rounded-full font-black ml-1 text-[11px]">
-              {activeTeam.highScore.toLocaleString()} pts
+              {(activeTeam.highScore || 0).toLocaleString()} pts
             </span>
           </div>
         )}

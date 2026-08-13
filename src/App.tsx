@@ -70,7 +70,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-[#202124] flex flex-col font-sans selection:bg-[#4285F4] selection:text-white">
+    <div className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] text-slate-100 flex flex-col font-sans selection:bg-[#4285F4] selection:text-white relative overflow-hidden">
       {/* Event Top Navigation Bar */}
       <Header
         currentView={currentView}
@@ -160,8 +160,7 @@ export default function App() {
         onSuccess={handleAdminAuthSuccess}
       />
 
-      {/* Footer Event Banner */}
-      <footer className="w-full py-4 border-t border-gray-200 bg-white text-center text-xs text-gray-500">
+      <footer className="w-full py-4 border-t border-white/10 bg-black/20 backdrop-blur-md text-center text-xs text-slate-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2 font-semibold">
           <span>🎮 Chrome Dino Event System • Powered by Google AI Studio</span>
           <div className="flex items-center gap-4">

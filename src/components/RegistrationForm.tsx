@@ -44,7 +44,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
       t.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!teamName.trim()) {
       setError('Please enter a Team Name.');
@@ -58,7 +58,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
     setError('');
     audio.playClick();
 
-    const newTeam = registerTeam({
+    const newTeam = await registerTeam({
       name: teamName,
       player1,
       player2,
@@ -71,7 +71,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
   return (
     <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Registration / Team Selection Column (2 cols) */}
-      <div className="lg:col-span-2 bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border-2 border-[#EA4335] relative overflow-hidden flex flex-col justify-between">
+      <div className="lg:col-span-2 bg-white/5 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-white/10 relative overflow-hidden flex flex-col justify-between text-white">
         {/* Top Google accent indicator */}
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#4285F4] via-[#EA4335] via-[#FBBC05] to-[#34A853]"></div>
 
@@ -87,7 +87,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
           </div>
 
           {/* Tab Selector */}
-          <div className="grid grid-cols-2 p-1.5 bg-gray-100 rounded-2xl mb-6">
+          <div className="grid grid-cols-2 p-1.5 bg-white/5 border border-white/10 rounded-2xl mb-6">
             <button
               onClick={() => {
                 setTab('new');
@@ -95,8 +95,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
               }}
               className={`py-2.5 text-xs sm:text-sm font-black rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 tab === 'new'
-                  ? 'bg-[#EA4335] text-white shadow-md'
-                  : 'text-gray-600 hover:text-[#EA4335]'
+                  ? 'bg-[#EA4335] text-white shadow-[0_0_15px_rgba(234,67,53,0.4)]'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
               <Sparkles className="w-4 h-4 text-yellow-300" />
@@ -110,8 +110,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
               }}
               className={`py-2.5 text-xs sm:text-sm font-black rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
                 tab === 'existing'
-                  ? 'bg-[#4285F4] text-white shadow-md'
-                  : 'text-gray-600 hover:text-[#4285F4]'
+                  ? 'bg-[#4285F4] text-white shadow-[0_0_15px_rgba(66,133,244,0.4)]'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
               <Users className="w-4 h-4" />
@@ -145,7 +145,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                     onChange={(e) => setTeamName(e.target.value)}
                     placeholder="e.g. Pixel Predators"
                     maxLength={32}
-                    className="w-full px-4 py-3 pl-11 bg-gray-100 border-2 border-transparent rounded-xl focus:border-[#4285F4] focus:bg-white outline-none font-semibold text-[#202124] transition-all text-sm"
+                    className="w-full px-4 py-3 pl-11 bg-white/10 border-2 border-transparent rounded-xl focus:border-[#4285F4] focus:bg-white/20 outline-none font-semibold text-white placeholder-gray-400 transition-all text-sm"
                     required
                   />
                 </div>
@@ -166,7 +166,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                       onChange={(e) => setPlayer1(e.target.value)}
                       placeholder="Player 1 Name"
                       maxLength={24}
-                      className="w-full px-4 py-3 pl-11 bg-gray-100 border-2 border-transparent rounded-xl focus:border-[#4285F4] focus:bg-white outline-none font-semibold text-[#202124] transition-all text-sm"
+                      className="w-full px-4 py-3 pl-11 bg-white/10 border-2 border-transparent rounded-xl focus:border-[#4285F4] focus:bg-white/20 outline-none font-semibold text-white placeholder-gray-400 transition-all text-sm"
                       required
                     />
                   </div>
@@ -185,7 +185,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                       onChange={(e) => setPlayer2(e.target.value)}
                       placeholder="Player 2 Name"
                       maxLength={24}
-                      className="w-full px-4 py-3 pl-11 bg-gray-100 border-2 border-transparent rounded-xl focus:border-[#4285F4] focus:bg-white outline-none font-semibold text-[#202124] transition-all text-sm"
+                      className="w-full px-4 py-3 pl-11 bg-white/10 border-2 border-transparent rounded-xl focus:border-[#4285F4] focus:bg-white/20 outline-none font-semibold text-white placeholder-gray-400 transition-all text-sm"
                       required
                     />
                   </div>
@@ -205,7 +205,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                     onChange={(e) => setContact(e.target.value)}
                     placeholder="For winner announcements"
                     maxLength={40}
-                    className="w-full px-4 py-3 pl-11 bg-gray-100 border-2 border-transparent rounded-xl focus:border-[#4285F4] focus:bg-white outline-none font-semibold text-[#202124] transition-all text-sm"
+                    className="w-full px-4 py-3 pl-11 bg-white/10 border-2 border-transparent rounded-xl focus:border-[#4285F4] focus:bg-white/20 outline-none font-semibold text-white placeholder-gray-400 transition-all text-sm"
                   />
                 </div>
               </div>
@@ -234,7 +234,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search registered team..."
-                  className="w-full bg-gray-100 border-2 border-transparent focus:border-[#4285F4] focus:bg-white rounded-xl py-3 pl-11 pr-4 text-[#202124] text-sm font-semibold outline-none"
+                  className="w-full bg-white/10 border-2 border-transparent focus:border-[#4285F4] focus:bg-white/20 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-400 text-sm font-semibold outline-none"
                 />
               </div>
 
@@ -251,14 +251,14 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                         audio.playClick();
                         onSelectExistingTeam(team);
                       }}
-                      className="p-3.5 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-[#4285F4] rounded-xl transition-all cursor-pointer flex items-center justify-between group"
+                      className="p-3.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/30 rounded-xl transition-all cursor-pointer flex items-center justify-between group"
                     >
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] font-black text-[#4285F4] px-2 py-0.5 rounded bg-blue-100 border border-blue-200">
                             {team.id}
                           </span>
-                          <h4 className="text-sm font-black text-[#202124] group-hover:text-[#4285F4] transition-colors">
+                          <h4 className="text-sm font-black text-white group-hover:text-blue-200 transition-colors">
                             {team.name}
                           </h4>
                         </div>
@@ -299,7 +299,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="bg-white rounded-3xl p-6 max-w-md w-full text-center shadow-2xl space-y-4 border-2 border-[#EA4335]"
+                className="bg-slate-900 border border-white/10 rounded-3xl p-6 max-w-md w-full text-center shadow-2xl space-y-4 text-white"
               >
                 <div className="w-12 h-12 bg-red-100 text-[#EA4335] rounded-2xl flex items-center justify-center mx-auto">
                   <Trash2 className="w-6 h-6" />
