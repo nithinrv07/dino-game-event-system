@@ -90,18 +90,26 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </nav>
 
-        {/* Active Team Indicator in Header */}
-        {activeTeam && (
-          <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 bg-white/15 border border-white/25 rounded-2xl text-xs font-bold text-white shadow-inner">
-            <UserCheck className="w-4 h-4 text-green-300" />
-            <span className="opacity-90">Playing:</span>
-            <span className="font-extrabold truncate max-w-[130px]">{activeTeam.name}</span>
-            <span className="bg-[#FBBC05] text-slate-950 px-2 py-0.5 rounded-full font-black ml-1 text-[11px]">
-              {(activeTeam.highScore || 0).toLocaleString()} pts
-            </span>
+        <div className="flex items-center gap-4 ml-auto">
+          {/* Active Team Indicator in Header */}
+          {activeTeam && (
+            <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 bg-white/15 border border-white/25 rounded-2xl text-xs font-bold text-white shadow-inner">
+              <UserCheck className="w-4 h-4 text-green-300" />
+              <span className="opacity-90">Playing:</span>
+              <span className="font-extrabold truncate max-w-[130px]">{activeTeam.name}</span>
+              <span className="bg-[#FBBC05] text-slate-950 px-2 py-0.5 rounded-full font-black ml-1 text-[11px]">
+                {(activeTeam.highScore || 0).toLocaleString()} pts
+              </span>
+            </div>
+          )}
+
+          {/* GDG Logo */}
+          <div className="flex items-center gap-1 font-black text-lg sm:text-xl tracking-tighter bg-white/5 border border-white/10 px-3 py-1 rounded-xl shadow-inner" title="Google Developer Groups">
+            <span className="text-[#4285F4]">G</span>
+            <span className="text-[#EA4335]">D</span>
+            <span className="text-[#FBBC05]">G</span>
           </div>
-        )}
-      </div>
+        </div>
     </header>
   );
 };
