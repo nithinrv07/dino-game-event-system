@@ -120,7 +120,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
           </div>
           <div>
             <span className="text-xs font-bold text-gray-500 block uppercase">Total Teams</span>
-            <span className="text-2xl font-black text-[#202124]">{stats.totalTeams}</span>
+            <span className="text-2xl font-black text-white">{stats.totalTeams}</span>
           </div>
         </div>
 
@@ -132,7 +132,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
           </div>
           <div>
             <span className="text-xs font-bold text-gray-500 block uppercase">Highest Score</span>
-            <span className="text-2xl font-black text-[#202124]">{stats.topScore.toLocaleString()}</span>
+            <span className="text-2xl font-black text-white">{stats.topScore.toLocaleString()}</span>
           </div>
         </div>
 
@@ -144,7 +144,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
           </div>
           <div>
             <span className="text-xs font-bold text-gray-500 block uppercase">Total Runs</span>
-            <span className="text-2xl font-black text-[#202124]">{stats.totalGamesPlayed}</span>
+            <span className="text-2xl font-black text-white">{stats.totalGamesPlayed}</span>
           </div>
         </div>
 
@@ -157,7 +157,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
           <div className="truncate">
             <span className="text-xs font-bold text-gray-500 block uppercase">Latest Score</span>
             {stats.latestScore ? (
-              <span className="text-sm font-bold text-[#202124] truncate block">
+              <span className="text-sm font-bold text-white truncate block">
                 {stats.latestScore.teamName}:{' '}
                 <strong className="text-[#EA4335] font-extrabold">{stats.latestScore.score.toLocaleString()}</strong>
               </span>
@@ -326,7 +326,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
             <AnimatePresence initial={false}>
               {filteredTeams.map((team, idx) => {
                 const rank = idx + 1;
-                let rankBadgeClass = 'bg-gray-100 text-gray-700 border-gray-200 font-bold';
+                let rankBadgeClass = 'bg-white/10 text-white border-white/20 font-bold';
                 if (rank === 1) rankBadgeClass = 'bg-[#FBBC05] text-slate-950 border-amber-400 font-black';
                 else if (rank === 2) rankBadgeClass = 'bg-[#4285F4] text-white border-blue-400 font-black';
                 else if (rank === 3) rankBadgeClass = 'bg-[#EA4335] text-white border-red-400 font-black';
@@ -340,7 +340,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                     className={`p-4 sm:p-5 flex items-center justify-between gap-4 transition-colors ${
-                      rank === 1 ? 'bg-amber-50/40' : rank === 2 ? 'bg-blue-50/40' : rank === 3 ? 'bg-red-50/40' : 'hover:bg-gray-50'
+                      rank === 1 ? 'bg-amber-50/20' : rank === 2 ? 'bg-blue-50/20' : rank === 3 ? 'bg-red-50/20' : 'hover:bg-white/10'
                     }`}
                   >
                     {/* Left: Rank & Team Info */}
@@ -355,7 +355,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
                         <div className="flex items-center gap-2 flex-wrap">
                           <button
                             onClick={() => setCertificateData({ team, rank })}
-                            className="text-base font-black text-[#202124] hover:text-[#4285F4] hover:underline truncate cursor-pointer text-left flex items-center gap-1.5 group"
+                            className="text-base font-black text-white hover:text-blue-300 hover:underline truncate cursor-pointer text-left flex items-center gap-1.5 group"
                             title="Click to generate & print team certificate"
                           >
                             <span>{team.name}</span>
@@ -365,9 +365,9 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
                             {team.id}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-0.5 truncate font-medium">
-                          Players: <strong className="text-gray-800">{team.player1}</strong> &{' '}
-                          <strong className="text-gray-800">{team.player2}</strong>
+                        <p className="text-xs text-slate-400 mt-0.5 truncate font-medium">
+                          Players: <strong className="text-white">{team.player1}</strong> &{' '}
+                          <strong className="text-white">{team.player2}</strong>
                         </p>
                       </div>
                     </div>
@@ -378,7 +378,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
                         <span className="text-xl sm:text-2xl font-black text-[#4285F4] tracking-tight block">
                           {team.highScore.toLocaleString()}
                         </span>
-                        <span className="text-[10px] text-gray-400 font-bold block uppercase">
+                        <span className="text-[10px] text-slate-400 font-bold block uppercase">
                           {team.totalAttempts || 0} attempt{team.totalAttempts === 1 ? '' : 's'}
                         </span>
                       </div>
@@ -389,13 +389,13 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
                         title="Print Certificate"
                       >
                         <Award className="w-3.5 h-3.5 text-amber-600" />
-                        <span className="hidden sm:inline">Certificate</span>
+                        <span className="hidden sm:inline text-amber-900">Certificate</span>
                       </button>
 
                       {onPlayTeam && (
                         <button
                           onClick={() => onPlayTeam(team)}
-                          className="px-3.5 py-2 bg-gray-100 hover:bg-[#4285F4] text-gray-700 hover:text-white rounded-xl text-xs font-black transition-all flex items-center gap-1 border border-gray-200 cursor-pointer uppercase"
+                          className="px-3.5 py-2 bg-white/10 hover:bg-[#4285F4] text-white hover:text-white rounded-xl text-xs font-black transition-all flex items-center gap-1 border border-white/20 cursor-pointer uppercase"
                         >
                           <Play className="w-3.5 h-3.5 fill-current" />
                           <span className="hidden sm:inline">Play</span>
