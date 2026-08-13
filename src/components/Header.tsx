@@ -110,6 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-[#FBBC05]">G</span>
           </div>
         </div>
+      </div>
     </header>
   );
 };
