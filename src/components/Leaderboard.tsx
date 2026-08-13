@@ -175,7 +175,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ onPlayTeam }) => {
             🏆 Event Podium Champions
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end max-w-4xl mx-auto pt-6">
             {/* Rank 2 - Silver/Blue (Left on Desktop, 2nd place) */}
             {top2 && (
               <motion.div
